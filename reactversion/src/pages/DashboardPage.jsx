@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
-// Import both sidebars
+// Import both sidebars for conditional rendering
 import StudentSidebar from '../components/shared/StudentSidebar';
 import TeacherSidebar from '../components/shared/TeacherSidebar';
 
@@ -23,37 +23,48 @@ const DashboardPage = () => {
     const { user, loading } = useAuth(); // Get user and loading state from context
 
     // This function renders the correct content based on the active page
-    console.log("LOGGED-IN USER PROFILE:", user);
     const renderContent = () => {
-        if (activePage === 'dashboard') {
-            return user.role === 'teacher' ? <TeacherDashboardContent /> : <StudentDashboardContent />;
+        if (!user) return null; // Should be caught by the loading check below, but good practice
+
+        // Teacher's panel
+        if (user.role === 'teacher') {
+            switch (activePage) {
+                case 'dashboard':
+                    // Pass setActivePage so the "Start Scanning" button works
+                    return <TeacherDashboardContent setActivePage={setActivePage} />;
+                case 'courses':
+                    return <CoursesContent />;
+                case 'mystudents':
+                    return <MyStudentsContent />;
+                case 'attendance':
+                    return <AttendanceContent />;
+                case 'scanning':
+                    return <ScanningContent />;
+                case 'assignments':
+                    return <AssignmentsContent />;
+                case 'settings':
+                    return <SettingsContent />;
+                default:
+                    return <TeacherDashboardContent setActivePage={setActivePage} />;
+            }
         }
         
-        switch (activePage) {
-            // Shared Pages
-            case 'attendance':
-                return <AttendanceContent />;
-            case 'settings':
-                return <SettingsContent />;
-            
-            // Student-specific Pages
-            case 'schedule':
-                return <ScheduleContent />;
-            case 'task':
-                return <TaskContent />;
-
-            // Teacher-specific Pages
-            case 'courses':
-                return <CoursesContent />;
-            case 'mystudents':
-                return <MyStudentsContent />;
-            case 'scanning':
-                return <ScanningContent />;
-            case 'assignments':
-                return <AssignmentsContent />;
-
-            default:
-                return user.role === 'teacher' ? <TeacherDashboardContent /> : <StudentDashboardContent />;
+        // Student's panel
+        else {
+            switch (activePage) {
+                case 'dashboard':
+                    return <StudentDashboardContent />;
+                case 'attendance':
+                    return <AttendanceContent />;
+                case 'schedule':
+                    return <ScheduleContent />;
+                case 'task':
+                    return <TaskContent />;
+                case 'settings':
+                    return <SettingsContent />;
+                default:
+                    return <StudentDashboardContent />;
+            }
         }
     };
 
