@@ -1,7 +1,23 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import api from '../api/axios'; // <-- It IMPORTS and USES your axios file
+import api from '../api/axios';
 
 const AuthContext = createContext(null);
+
+// This helper function takes the nested user object from the backend
+// and creates a simple, "flat" object for our frontend state.
+const processUserData = (backendUser) => {
+    if (!backendUser || !backendUser.profileId) {
+        return null;
+    }
+    
+    return {
+        ...backendUser.profileId, // Spreads the profile fields (like name, rollNumber, department)
+        _id: backendUser._id,     // We want the main User ID, not the profile ID
+        email: backendUser.email,
+        role: backendUser.role,
+        settings: backendUser.settings,
+    };
+};
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -10,37 +26,26 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
-            // If a token exists, verify it by fetching user data
             api.get('/auth/me')
                 .then(response => {
-                    // If the token is valid, set the user
-                    setUser(response.data.data);
+                    const flatUser = processUserData(response.data.data);
+                    setUser(flatUser);
                 })
                 .catch(() => {
-                    // If the token is invalid or expired, remove it
                     localStorage.removeItem('token');
                     setUser(null);
                 })
-                .finally(() => {
-                    // Stop loading once the check is complete
-                    setLoading(false);
-                });
+                .finally(() => setLoading(false));
         } else {
-            setLoading(false); // No token, stop loading
+            setLoading(false);
         }
     }, []);
 
     const login = async (email, password) => {
-        // Use the 'api' instance to make the login request
         const response = await api.post('/auth/login', { email, password });
         localStorage.setItem('token', response.data.token);
-        // The user object from your backend has a nested 'profileId'
-        const userData = {
-            ...response.data.user.profileId, // Spread the profile details (name, etc.)
-            email: response.data.user.email, // Add the email from the main user object
-            role: response.data.user.role,   // Add the role
-        };
-        setUser(userData);
+        const flatUser = processUserData(response.data.user);
+        setUser(flatUser);
         return response;
     };
 
@@ -49,16 +54,8 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     };
 
-    // The value provided to consuming components
-    const value = {
-        user,
-        login,
-        logout,
-        isAuthenticated: !!user, // A simple boolean to check if user is logged in
-        loading
-    };
+    const value = { user, login, logout, isAuthenticated: !!user, loading };
 
-    // Don't render the app until the initial token check is complete
     return (
         <AuthContext.Provider value={value}>
             {!loading && children}
@@ -66,5 +63,4 @@ export const AuthProvider = ({ children }) => {
     );
 };
 
-// Custom hook to easily use the auth context in other components
 export const useAuth = () => useContext(AuthContext);

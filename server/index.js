@@ -54,7 +54,7 @@ import attendanceRoutes from './routes/attendanceRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import assignmentRoutes from './routes/assignmentRoutes.js';
 import courseRoutes from './routes/courseRoutes.js';
-
+import scheduleRoutes from './routes/scheduleRoutes.js';
 
 // Initialize Express app
 const app = express();
@@ -77,6 +77,7 @@ app.use('/api/attendance', attendanceRoutes);
 app.use('/api/users',userRoutes );
 app.use('/api/assignments', assignmentRoutes);
 app.use('/api/courses', courseRoutes);
+app.use('/api/schedules', scheduleRoutes);
 
 
 // Define the port

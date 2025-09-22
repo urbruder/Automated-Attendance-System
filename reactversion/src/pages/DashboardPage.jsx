@@ -9,6 +9,7 @@ import TeacherSidebar from '../components/shared/TeacherSidebar';
 import Header from '../components/shared/Header';
 import StudentDashboardContent from '../components/dashboard/StudentDashboardContent';
 import TeacherDashboardContent from '../components/dashboard/TeacherDashboardContent';
+import CoursesContent from '../components/dashboard/CoursesContent';
 import MyStudentsContent from '../components/dashboard/MyStudentsContent';
 import AttendanceContent from '../components/dashboard/AttendanceContent';
 import ScheduleContent from '../components/dashboard/ScheduleContent';
@@ -22,6 +23,7 @@ const DashboardPage = () => {
     const { user, loading } = useAuth(); // Get user and loading state from context
 
     // This function renders the correct content based on the active page
+    console.log("LOGGED-IN USER PROFILE:", user);
     const renderContent = () => {
         if (activePage === 'dashboard') {
             return user.role === 'teacher' ? <TeacherDashboardContent /> : <StudentDashboardContent />;
@@ -38,9 +40,11 @@ const DashboardPage = () => {
             case 'schedule':
                 return <ScheduleContent />;
             case 'task':
-                return <TaskContent />; // <-- Corrected this line
+                return <TaskContent />;
 
             // Teacher-specific Pages
+            case 'courses':
+                return <CoursesContent />;
             case 'mystudents':
                 return <MyStudentsContent />;
             case 'scanning':

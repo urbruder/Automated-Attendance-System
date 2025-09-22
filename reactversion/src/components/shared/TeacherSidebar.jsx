@@ -6,11 +6,13 @@ import {
     FaStar, 
     FaCamera, 
     FaTasks, 
-    FaCog 
+    FaCog,
+    FaBookOpen
 } from 'react-icons/fa';
 
 const menuItems = [
     { id: 'dashboard', icon: <FaThLarge />, label: 'Dashboard' },
+    { id: 'courses', icon: <FaBookOpen />, label: 'Courses & Schedule' },
     { id: 'mystudents', icon: <FaUsers />, label: 'My Students' },
     { id: 'attendance', icon: <FaStar />, label: 'Attendance' },
     { id: 'scanning', icon: <FaCamera />, label: 'Scanning' },
