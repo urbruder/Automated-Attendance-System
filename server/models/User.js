@@ -26,6 +26,17 @@ const UserSchema = new mongoose.Schema({
     profileId: {
         type: mongoose.Schema.ObjectId,
         refPath: 'role'
+    },
+        settings: {
+        tfaEnabled: {
+            type: Boolean,
+            default: false
+        },
+        notifications: {
+            email: { type: Boolean, default: true },
+            assignments: { type: Boolean, default: true },
+            schedule: { type: Boolean, default: false }
+        }
     }
 }, { timestamps: true });
 

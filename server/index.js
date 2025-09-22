@@ -51,6 +51,8 @@ import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import studentRoutes from './routes/studentRoutes.js';
 import attendanceRoutes from './routes/attendanceRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+
 
 // Initialize Express app
 const app = express();
@@ -70,6 +72,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/attendance', attendanceRoutes);
+app.use('/api/users',userRoutes )
 
 // Define the port
 const PORT = process.env.PORT || 5000;
