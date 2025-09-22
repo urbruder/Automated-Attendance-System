@@ -52,6 +52,8 @@ import authRoutes from './routes/authRoutes.js';
 import studentRoutes from './routes/studentRoutes.js';
 import attendanceRoutes from './routes/attendanceRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import assignmentRoutes from './routes/assignmentRoutes.js';
+import courseRoutes from './routes/courseRoutes.js';
 
 
 // Initialize Express app
@@ -72,7 +74,10 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/attendance', attendanceRoutes);
-app.use('/api/users',userRoutes )
+app.use('/api/users',userRoutes );
+app.use('/api/assignments', assignmentRoutes);
+app.use('/api/courses', courseRoutes);
+
 
 // Define the port
 const PORT = process.env.PORT || 5000;

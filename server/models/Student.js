@@ -1,4 +1,3 @@
-// models/Student.js
 import mongoose from 'mongoose';
 
 const StudentSchema = new mongoose.Schema({
@@ -16,9 +15,19 @@ const StudentSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    // --- ADD THIS FIELD ---
+    department: {
+        type: String,
+        required: [true, 'Please add a department']
+    },
     faceEmbedding: {
         type: [Number],
         default: []
+    },
+    academicYear: { // <-- Add this field
+        type: String,
+        required: [true, 'Please add an academic year'],
+        enum: ['1st Year', '2nd Year', '3rd Year', '4th Year']
     },
     courses: [{
         type: mongoose.Schema.ObjectId,
@@ -27,4 +36,3 @@ const StudentSchema = new mongoose.Schema({
 }, { collection: 'students' });
 
 export default mongoose.model('student', StudentSchema);
-

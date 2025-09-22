@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-// Reusable Login Box Component
+// The LoginBox component remains the same, it's a reusable UI piece
 const LoginBox = ({ userType, email, setEmail, password, setPassword, onSubmit, error, isLoading }) => {
   const isStudent = userType === 'Student';
   const bgColor = isStudent ? 'bg-slate-700' : 'bg-gray-200';
@@ -20,7 +20,6 @@ const LoginBox = ({ userType, email, setEmail, password, setPassword, onSubmit, 
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            // Styling for the white text box
             className="w-full p-3 rounded-md border-none outline-none bg-white text-gray-900 placeholder-gray-500"
           />
         </div>
@@ -31,7 +30,6 @@ const LoginBox = ({ userType, email, setEmail, password, setPassword, onSubmit, 
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            // Styling for the white text box
             className="w-full p-3 rounded-md border-none outline-none bg-white text-gray-900 placeholder-gray-500"
           />
         </div>
@@ -50,34 +48,53 @@ const LoginBox = ({ userType, email, setEmail, password, setPassword, onSubmit, 
 };
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  // State for the Student Login form
+  const [studentEmail, setStudentEmail] = useState('');
+  const [studentPassword, setStudentPassword] = useState('');
+  const [studentError, setStudentError] = useState('');
+  const [isStudentLoading, setIsStudentLoading] = useState(false);
+
+  // --- NEW: State for the Teacher/Admin Login form ---
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const [adminError, setAdminError] = useState('');
+  const [isAdminLoading, setIsAdminLoading] = useState(false);
 
   const navigate = useNavigate();
-  const { login } = useAuth(); // Get the login function from our context
+  const { login } = useAuth();
 
   const handleStudentLogin = async (e) => {
     e.preventDefault();
-    setError('');
-    setIsLoading(true);
+    setStudentError('');
+    setIsStudentLoading(true);
 
     try {
-      // Use the login function from the context
-      await login(email, password);
+      await login(studentEmail, studentPassword);
       navigate('/dashboard');
     } catch (err) {
       const message = err.response?.data?.message || 'Login failed. Please check your credentials.';
-      setError(message);
+      setStudentError(message);
     } finally {
-      setIsLoading(false);
+      setIsStudentLoading(false);
     }
   };
 
-  const handleAdminLogin = (e) => {
+  // --- UPDATED: Logic for the Teacher/Admin Login ---
+  const handleAdminLogin = async (e) => {
     e.preventDefault();
-    alert("Admin login not implemented yet.");
+    setAdminError('');
+    setIsAdminLoading(true);
+
+    try {
+      // The same login function works for both roles
+      await login(adminEmail, adminPassword);
+      navigate('/dashboard');
+    } catch (err) {
+      const message = err.response?.data?.message || 'Login failed. Please check your credentials.';
+      setAdminError(message);
+    } finally {
+      setIsAdminLoading(false);
+    }
   };
 
   return (
@@ -88,22 +105,27 @@ const LoginPage = () => {
       <main className="flex w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl bg-white">
         <LoginBox
           userType="Student"
-          email={email}
-          setEmail={setEmail}
-          password={password}
-          setPassword={setPassword}
+          email={studentEmail}
+          setEmail={setStudentEmail}
+          password={studentPassword}
+          setPassword={setStudentPassword}
           onSubmit={handleStudentLogin}
-          error={error}
-          isLoading={isLoading}
+          error={studentError}
+          isLoading={isStudentLoading}
         />
-        {/* You can implement a separate state for Admin login if needed */}
+        {/* --- UPDATED: Props for the Admin Login Box --- */}
         <LoginBox
           userType="Admin"
+          email={adminEmail}
+          setEmail={setAdminEmail}
+          password={adminPassword}
+          setPassword={setAdminPassword}
           onSubmit={handleAdminLogin}
+          error={adminError}
+          isLoading={isAdminLoading}
         />
       </main>
       
-      {/* Link to the Register Page */}
       <div className="mt-6 text-center text-gray-600">
         Don't have an account?{' '}
         <Link to="/register" className="font-semibold text-blue-600 hover:underline">

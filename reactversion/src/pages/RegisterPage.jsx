@@ -1,19 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../api/axios'; // Your axios instance
+import api from '../api/axios';
 
 const RegisterPage = () => {
-    const [role, setRole] = useState('student'); // 'student' or 'teacher'
+    const [role, setRole] = useState('student');
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         password: '',
         rollNumber: '',
         department: '',
+        academicYear: ''
     });
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const navigate = useNavigate();
+
+    const departmentOptions = ['Computer Science', 'Electronics and Communication', 'Mechanical Engineering', 'Civil Engineering'];
+    const yearOptions = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
 
     const handleInputChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -24,26 +27,16 @@ const RegisterPage = () => {
         setError('');
         setIsLoading(true);
 
-        // Construct the payload based on the selected role
-        const payload = {
-            name: formData.name,
-            email: formData.email,
-            password: formData.password,
-            role: role,
-        };
-
-        if (role === 'student') {
-            payload.rollNumber = formData.rollNumber;
-        } else {
-            payload.department = formData.department;
+        const payload = { ...formData, role };
+        if (role === 'teacher') {
+            delete payload.rollNumber;
+            delete payload.academicYear;
         }
 
         try {
             const response = await api.post('/auth/register', payload);
             if (response.data.success) {
-                // The backend automatically logs the user in, so save the token
                 localStorage.setItem('token', response.data.token);
-                // Reload the page to trigger the AuthContext's user check
                 window.location.href = '/dashboard';
             }
         } catch (err) {
@@ -54,6 +47,7 @@ const RegisterPage = () => {
         }
     };
 
+    // This is the fully implemented RoleTab component
     const RoleTab = ({ userRole, label }) => (
         <button
             type="button"
@@ -70,17 +64,17 @@ const RegisterPage = () => {
 
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center font-sans p-4">
-            <div className="absolute top-5 text-2xl font-bold text-slate-700">
-                <span>SmartTrack CAMPUS</span>
+            <div className="text-center mb-6">
+                <h1 className="text-3xl font-bold text-slate-800">SmartTrack CAMPUS</h1>
             </div>
 
-            <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
-                <div className="flex">
+            <div className="w-full max-w-md">
+                <div className="flex rounded-t-xl overflow-hidden">
                     <RoleTab userRole="student" label="I am a Student" />
                     <RoleTab userRole="teacher" label="I am a Teacher" />
                 </div>
 
-                <div className="p-8">
+                <div className="bg-white rounded-b-xl shadow-2xl p-8">
                     <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
                         Create Your Account
                     </h2>
@@ -89,11 +83,25 @@ const RegisterPage = () => {
                         <input type="email" name="email" placeholder="Email Address" required onChange={handleInputChange} className="w-full p-3 border rounded-md" />
                         <input type="password" name="password" placeholder="Password (min. 6 characters)" required onChange={handleInputChange} className="w-full p-3 border rounded-md" />
 
-                        {/* Conditional Inputs */}
                         {role === 'student' ? (
-                            <input type="text" name="rollNumber" placeholder="Roll Number" required onChange={handleInputChange} className="w-full p-3 border rounded-md" />
+                            <>
+                                <input type="text" name="rollNumber" placeholder="Roll Number" required onChange={handleInputChange} className="w-full p-3 border rounded-md" />
+                                
+                                <select name="department" required onChange={handleInputChange} className="w-full p-3 border rounded-md" defaultValue="">
+                                    <option value="" disabled>Select your department</option>
+                                    {departmentOptions.map(dept => <option key={dept} value={dept}>{dept}</option>)}
+                                </select>
+
+                                <select name="academicYear" required onChange={handleInputChange} className="w-full p-3 border rounded-md" defaultValue="">
+                                    <option value="" disabled>Select academic year</option>
+                                    {yearOptions.map(year => <option key={year} value={year}>{year}</option>)}
+                                </select>
+                            </>
                         ) : (
-                            <input type="text" name="department" placeholder="Department (e.g., Computer Science)" required onChange={handleInputChange} className="w-full p-3 border rounded-md" />
+                            <select name="department" required onChange={handleInputChange} className="w-full p-3 border rounded-md" defaultValue="">
+                                <option value="" disabled>Select your department</option>
+                                {departmentOptions.map(dept => <option key={dept} value={dept}>{dept}</option>)}
+                            </select>
                         )}
 
                         {error && <p className="text-red-500 text-sm text-center">{error}</p>}
@@ -104,6 +112,7 @@ const RegisterPage = () => {
                     </form>
                 </div>
             </div>
+            
             <div className="mt-6 text-center text-gray-600">
                 Already have an account?{' '}
                 <Link to="/" className="font-semibold text-blue-600 hover:underline">
