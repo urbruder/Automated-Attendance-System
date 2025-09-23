@@ -26,7 +26,6 @@ app.use(cors()); // Enable Cross-Origin Resource Sharing
 app.use(express.json()); // To accept JSON data in the body
 
 // API Routes
-// This specific route is for Vercel to have a root endpoint for the API function.
 app.get('/', (req, res) => {
     res.send('Smart Attendance System API is running...');
 });
@@ -39,6 +38,13 @@ app.use('/api/assignments', assignmentRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/schedules', scheduleRoutes);
 
-// Vercel handles the server creation. We just need to export the app.
-// The app.listen() block has been removed.
+
+// Vercel handles the server creation, so we only need to listen locally.
+// We check if the environment is NOT production and start the server.
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => console.log(`Server running for local development on port ${PORT}`));
+}
+
+// Export the app for Vercel
 export default app;
